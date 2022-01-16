@@ -32,7 +32,7 @@ def R_format(currentInstruction):
             else:
                 valrs1 = twoComplement(registers[rs1])
                 valrs2 = twoComplement(registers[rs2])
-                print(valrs1, valrs2)
+                # print(valrs1, valrs2)
                 sign = 0
                 if valrs1 < 0:
                     valrs1 *= -1
@@ -71,7 +71,7 @@ def I_format(currentInstruction):
     elif opcode == '0000011':
         if funct3 == 2:
             if registers[rs1] + imm not in variables:
-                print('ce ai facut sefu')
+                print('Se acceseaza zona de memorie nealocata')
             else:
                 registers[rd] = variables[registers[rs1] + imm]
 
@@ -199,8 +199,8 @@ programCounter = 10720
 running = True
 steps = 100000
 while running == True and steps > 0:
-    print(registers)
-    print(programCounter)
+    # print(registers)
+    # print(programCounter)
     currentInstruction = instructionFetch()
     instructionDecode(currentInstruction)
     steps -= 1
