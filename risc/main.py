@@ -7,6 +7,8 @@ def instructionFetch():
     programCounter += 4
     return currentInstruction
 
+def twoComplement(x):
+    return x - 2 ** 32 * (x >> 31)
 
 def R_format(currentInstruction):
     opcode = currentInstruction[-7:]
@@ -28,8 +30,9 @@ def R_format(currentInstruction):
             if registers[rs2] == 0:
                 registers[rd] = registers[rs1]
             else:
-                valrs1 = registers[rs1]
-                valrs2 = registers[rs2]
+                valrs1 = twoComplement(registers[rs1])
+                valrs2 = twoComplement(registers[rs2])
+                print(valrs1, valrs2)
                 sign = 0
                 if valrs1 < 0:
                     valrs1 *= -1
@@ -39,6 +42,7 @@ def R_format(currentInstruction):
                 registers[rd] = (valrs1 % valrs2)
                 if sign % 2 == 1:
                     registers[rd] *= -1
+                registers[rd] = registers[rd] & only_ones
                 # print(registers[rs1], registers[rs2], registers[rd])
 
 
@@ -56,18 +60,9 @@ def I_format(currentInstruction):
     # print(imm, rs1, funct3, rd, opcode)
     if opcode == '0010011':
         if funct3 == 0: #ADDI
-            if filename[13] == 'm':
-                val = (registers[rs1] + imm)
-                sign = 1
-                if val < 0:
-                    sign = -1
-                    val *= -1
-                val &= only_ones
-                registers[rd] = val * sign
-            else:
-                registers[rd] = ((registers[rs1] + imm) & only_ones)
+            registers[rd] = ((registers[rs1] + imm) & only_ones)
         elif funct3 == 6: # ORI
-            registers[rd] = (registers[rs1] | imm)
+            registers[rd] = ((registers[rs1] | imm) & only_ones)
         elif funct3 == 1: #SLLI
             registers[rd] = (registers[rs1] * (2 ** shamt)) & only_ones
     elif opcode == '1110011':
@@ -204,7 +199,8 @@ programCounter = 10720
 running = True
 steps = 100000
 while running == True and steps > 0:
-    # print(registers)
+    print(registers)
+    print(programCounter)
     currentInstruction = instructionFetch()
     instructionDecode(currentInstruction)
     steps -= 1
@@ -213,4 +209,4 @@ if steps == 0: #infinite loop
     print('failed')
 else:
     print('passed')
-# print(registers)
+#print(registers)
